@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CalendarEvent, Task, ViewMode, DigitalViewMode, CalendarConfig, ChatMessage, Theme } from './types';
 import { analyzeImage, suggestSchedule, chatWithAI, estimateTaskDuration } from './services/geminiService';
 import { PrintLayout } from './components/PrintLayout';
+import { SettingsModal } from './components/SettingsModal';
 import { useToast } from './components/Toast';
 import { validateEventTitle, validateTaskTitle, validateImageFile } from './utils/validation';
-import { Camera, Calendar as CalendarIcon, Printer, CheckSquare, Plus, Loader2, X, Clock, Layout, List, Edit2, Trash2, Wand2, Download, GripVertical, Users, Eye, EyeOff, Play, Pause, MessageSquare, Send, Sparkles, Moon, Sun, RotateCcw, Timer, ChevronLeft, ChevronRight, CalendarDays, Repeat } from 'lucide-react';
+import { Camera, Calendar as CalendarIcon, Printer, CheckSquare, Plus, Loader2, X, Clock, Layout, List, Edit2, Trash2, Wand2, Download, GripVertical, Users, Eye, EyeOff, Play, Pause, MessageSquare, Send, Sparkles, Moon, Sun, RotateCcw, Timer, ChevronLeft, ChevronRight, CalendarDays, Repeat, Settings } from 'lucide-react';
 import { Platform, applySafeAreaVars } from './utils/platform';
 import { takePicture, requestCameraPermissions, saveTextFile } from './utils/capacitorHelpers';
 import { Directory } from '@capacitor/filesystem';
@@ -57,6 +58,10 @@ const App: React.FC = () => {
   const [chatInput, setChatInput] = useState("");
   const [isChatLoading, setIsChatLoading] = useState(false);
 
+  // Settings
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFirstRun, setIsFirstRun] = useState(false);
+
   // Drag and Drop State
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
 
@@ -95,6 +100,13 @@ const App: React.FC = () => {
     console.log('Platform:', Platform.getPlatform());
     console.log('Is Native:', Platform.isNative());
     console.log('Is Mobile:', Platform.isMobile());
+
+    // Check if this is the first run
+    const setupComplete = localStorage.getItem('ai_setup_complete');
+    if (!setupComplete) {
+      setIsFirstRun(true);
+      setIsSettingsOpen(true);
+    }
   }, []);
 
   // Persistence
@@ -846,8 +858,12 @@ const App: React.FC = () => {
 
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
           
-          <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
+          <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full" title="Toggle theme">
               {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+
+          <button onClick={() => setIsSettingsOpen(true)} className="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full" title="AI Provider Settings">
+              <Settings className="w-5 h-5" />
           </button>
 
           {eventsHistory && (
@@ -1188,6 +1204,13 @@ const App: React.FC = () => {
         )}
 
       </main>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        isFirstRun={isFirstRun}
+      />
     </div>
   );
 };

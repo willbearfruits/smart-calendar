@@ -1,5 +1,5 @@
 // AI Provider Configuration
-export type AIProvider = 'gemini' | 'openai' | 'claude' | 'ollama' | 'lmstudio';
+export type AIProvider = 'gemini' | 'openai' | 'claude' | 'ollama' | 'lmstudio' | 'none';
 
 export interface AIProviderConfig {
   provider: AIProvider;
@@ -14,7 +14,8 @@ export const DEFAULT_MODELS: Record<AIProvider, string> = {
   openai: 'gpt-4-turbo-preview',
   claude: 'claude-3-5-sonnet-20241022',
   ollama: 'llama3.2',
-  lmstudio: 'local-model'
+  lmstudio: 'local-model',
+  none: ''
 };
 
 export const DEFAULT_BASE_URLS: Record<string, string> = {
@@ -22,8 +23,28 @@ export const DEFAULT_BASE_URLS: Record<string, string> = {
   lmstudio: 'http://localhost:1234'
 };
 
-// Get provider config from environment
+// Runtime configuration (can be updated via API)
+let runtimeConfig: AIProviderConfig | null = null;
+
+// Set runtime configuration (called from API endpoint)
+export function setProviderConfig(config: AIProviderConfig): void {
+  runtimeConfig = config;
+}
+
+// Get provider config from runtime or environment
 export function getProviderConfig(): AIProviderConfig {
+  // If runtime config is set, use it
+  if (runtimeConfig) {
+    return {
+      ...runtimeConfig,
+      enabled: runtimeConfig.provider !== 'none' && (
+        !!runtimeConfig.apiKey ||
+        ['ollama', 'lmstudio'].includes(runtimeConfig.provider)
+      )
+    };
+  }
+
+  // Fall back to environment variables
   const provider = (process.env.AI_PROVIDER || 'gemini') as AIProvider;
 
   return {

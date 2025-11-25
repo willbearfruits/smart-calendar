@@ -6,6 +6,7 @@ import {
   estimateTaskDuration
 } from '../services/geminiService.js';
 import { getProviderInfo, isAIAvailable } from '../services/unifiedAIService.js';
+import { setProviderConfig } from '../config/aiProviders.js';
 import {
   validateAnalyzeImage,
   validateSuggestSchedule,
@@ -27,6 +28,39 @@ router.get('/provider-info', (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: error.message || 'Failed to get provider info'
+    });
+  }
+});
+
+// POST /api/provider-config
+router.post('/provider-config', (req: Request, res: Response) => {
+  try {
+    const { provider, apiKey, baseUrl, model } = req.body;
+
+    if (!provider) {
+      return res.status(400).json({
+        success: false,
+        error: 'Provider is required'
+      });
+    }
+
+    const config = {
+      provider,
+      apiKey: apiKey || undefined,
+      baseUrl: baseUrl || undefined,
+      model: model || undefined
+    };
+
+    setProviderConfig(config as any);
+
+    res.json({
+      success: true,
+      message: 'Provider configuration updated successfully'
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to update provider config'
     });
   }
 });
