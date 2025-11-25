@@ -1,0 +1,129 @@
+{
+  "name": "smart-calendar",
+  "productName": "Smart Calendar",
+  "version": "1.0.0",
+  "description": "AI-Powered Smart Calendar with Multi-Provider Support",
+  "author": "Smart Calendar Contributors",
+  "homepage": "https://github.com/yourusername/smart-calendar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/smart-calendar.git"
+  },
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "dev:all": "concurrently \"npm run server:dev\" \"npm run dev\" --names \"backend,frontend\" --prefix-colors \"bgBlue,bgMagenta\"",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server:dev": "cd server && npm run dev",
+    "server:build": "cd server && npm run build",
+    "server:start": "cd server && npm start",
+    "server:install": "cd server && npm install",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"npm run dev\" \"npm run server:dev\" \"wait-on http://localhost:3000 http://localhost:3001 && electron .\" --names \"frontend,backend,electron\" --prefix-colors \"bgMagenta,bgBlue,bgGreen\"",
+    "electron:build": "npm run build && npm run server:build && electron-builder",
+    "electron:build:linux": "npm run build && npm run server:build && electron-builder --linux",
+    "electron:build:win": "npm run build && npm run server:build && electron-builder --win",
+    "electron:build:mac": "npm run build && npm run server:build && electron-builder --mac",
+    "electron:build:all": "npm run build && npm run server:build && electron-builder -mwl",
+    "package": "npm run electron:build:linux",
+    "cap:init": "cap init",
+    "cap:sync": "npm run build && cap sync",
+    "cap:sync:android": "npm run build && cap sync android",
+    "cap:sync:ios": "npm run build && cap sync ios",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios",
+    "cap:run:android": "cap run android",
+    "cap:run:ios": "cap run ios",
+    "cap:update": "cap update",
+    "build:mobile": "npm run build && cap sync",
+    "android": "npm run build && cap sync android && cap open android",
+    "ios": "npm run build && cap sync ios && cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/camera": "^7.0.2",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/filesystem": "^7.1.4",
+    "@capacitor/ios": "^7.4.4",
+    "@google/genai": "^1.30.0",
+    "dexie": "^4.2.1",
+    "lucide-react": "^0.554.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.3",
+    "electron-builder": "^26.0.12",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0",
+    "vite-plugin-pwa": "^1.1.0",
+    "wait-on": "^9.0.3",
+    "workbox-window": "^7.4.0"
+  },
+  "build": {
+    "appId": "com.glitches.smartcalendar",
+    "productName": "Smart Calendar",
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/dist/**/*",
+      "server/package.json",
+      "server/node_modules/**/*",
+      "!server/src/**/*",
+      "!server/.env"
+    ],
+    "extraResources": [
+      {
+        "from": "server/dist",
+        "to": "server/dist"
+      },
+      {
+        "from": "server/node_modules",
+        "to": "server/node_modules"
+      }
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "release"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "category": "Office",
+      "maintainer": "Smart Calendar <noreply@example.com>",
+      "description": "AI-Powered Calendar & Task Manager with handwriting recognition",
+      "synopsis": "AI calendar and task manager with handwriting OCR"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.icns"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

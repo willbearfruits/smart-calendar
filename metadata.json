@@ -1,0 +1,5 @@
+{
+  "name": "Note-to-Calendar Converter",
+  "description": "An intelligent app that converts handwritten schedule notes into digital, printable A4 foldable calendars using Gemini 2.5 Flash.",
+  "requestFramePermissions": []
+}
