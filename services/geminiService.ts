@@ -1,7 +1,7 @@
 import { ExtractedData, Task, CalendarEvent, ChatMessage } from "../types";
 
 // Backend API URL - can be configured via environment variable
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:3001';
 
 interface ApiResponse<T> {
   success: boolean;
